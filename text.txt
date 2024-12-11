@@ -1,0 +1,243 @@
+BuscadorEmpleado.java:
+import java.util.List;
+
+public class BuscadorEmpleado {
+    public static Empleado buscarEmpleadoPorNombre(String nombre, List<Empleado> empleados) {
+        for (Empleado empleado : empleados) {
+            if (empleado.getNombre().equals(nombre)) {
+                return empleado; //edit
+            }
+        }
+        return null;
+    }
+
+    // Más metodos
+}
+
+
+Empleado.java:
+public class Empleado {
+    private String nombre;
+    private double salarioBase;
+    private int horasTrabajadas;
+    private String departamento;
+    private double tarifaHora;
+
+    public Empleado(){}
+    public Empleado(String nombre, double salarioBase, int horasTrabajadas, double tarifaHora, String departamento) {
+        this.nombre = nombre;
+        this.salarioBase = salarioBase;
+        this.horasTrabajadas = horasTrabajadas;
+        this.tarifaHora = tarifaHora;
+        this.departamento = departamento;
+    }
+
+    //Extract Method refactoring porque posee mas de 10 lineas de codigo lo que lo convierte en un codigo mas dificil de leer
+    public double calcularSalario() {
+        double salarioTotal = salarioBase;
+        if (salarioBase>0) {
+            if (horasTrabajadas >= 0) {
+                // Horas trabajadas normales = 40;
+                if (horasTrabajadas > 40) {
+                    salarioTotal += (horasTrabajadas - 40) * 50; // Pago de horas extra
+                }
+            }else {
+                throw new IllegalArgumentException("Las horas trabajadas deben ser mayor o igual a 0");
+            }
+        } else {
+            throw new IllegalArgumentException("El salario debe ser mayor o igual a 0");
+        }
+        switch (departamento) {
+            case "Sistemas":
+                salarioTotal += 20;
+                break;
+            case "Contabilidad":
+                salarioTotal += 10;
+                break;
+            default:
+                break;
+        }
+        return salarioTotal;
+    }
+
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public double getSalarioBase() {
+        return salarioBase;
+    }
+
+    public void setSalarioBase(double salarioBase) {
+        this.salarioBase = salarioBase;
+    }
+
+    public int getHorasTrabajadas() {
+        return horasTrabajadas;
+    }
+
+    public void setHorasTrabajadas(int horasTrabajadas) {
+        this.horasTrabajadas = horasTrabajadas;
+    }
+
+    public double getTarifaHora() {
+        return tarifaHora;
+    }
+
+    public void setTarifaHora(double tarifaHora) {
+        this.tarifaHora = tarifaHora;
+    }
+
+    public String getDepartamento() {
+        return departamento;
+    }
+
+    public void setDepartamento(String departamento) {
+        this.departamento = departamento;
+    }
+
+    // Más metodos
+
+    //Pull up method refactoring tech porque habia codigo duplicado en las clases hijas con este metodo
+    
+    public void imprimirDetalles() {
+        System.out.println("Nombre: " + super.getNombre());
+        System.out.println("Genero: " + super.getNombre());
+        System.out.println("Salario: " + super.getSalarioBase());
+        System.out.println("Horas trabajadas: " + super.getHorasTrabajadas());
+        System.out.println("Departamento: " + super.getDepartamento());
+    }
+    
+}
+
+EmpleadoFijo.java:
+public class EmpleadoFijo extends Empleado {
+    private double bonoAnual;
+    private String genero;
+
+    public EmpleadoFijo(String nombre, double salarioBase, int horasTrabajadas, String departamento, double bonoAnual, String genero) {
+        super(nombre, salarioBase, horasTrabajadas, 0, departamento);
+        this.bonoAnual = bonoAnual;
+        this.genero = genero;
+    }
+
+
+    // Se modifico por la refactorizacion de pull up method
+    @Override
+    public void imprimirDetalles() {
+        super.imprimirDetalles();
+        System.out.println("bonoAnual: " + bonoAnual);
+    }
+
+    // Más metodos
+}
+
+
+EmpleadoPorHoras.java:
+public class EmpleadoFijo extends Empleado {
+    private double bonoAnual;
+    private String genero;
+
+    public EmpleadoFijo(String nombre, double salarioBase, int horasTrabajadas, String departamento, double bonoAnual, String genero) {
+        super(nombre, salarioBase, horasTrabajadas, 0, departamento);
+        this.bonoAnual = bonoAnual;
+        this.genero = genero;
+    }
+
+
+    // Se modifico por la refactorizacion de pull up method
+    @Override
+    public void imprimirDetalles() {
+        super.imprimirDetalles();
+        System.out.println("bonoAnual: " + bonoAnual);
+    }
+
+    // Más metodos
+}
+
+
+EmpleadoTemporario.java:
+public class EmpleadoTemporario extends Empleado {
+    private String nombre;
+    private String genero;
+    private double salarioBase;
+    private int horasTrabajadas;
+    private String departamento;
+    private int mesesContrato;
+
+    public EmpleadoTemporario(String nombre, double salarioBase, int horasTrabajadas, String departamento, int mesesContrato, String genero) {
+        this.nombre = nombre;
+        this.salarioBase = salarioBase;
+        this.horasTrabajadas = horasTrabajadas;
+        this.departamento = departamento;
+        this.mesesContrato = mesesContrato;
+        this.genero = genero;
+    }
+
+
+    // por el pull up method se modifico este codigo para que el codigo sea mas sencillo
+    public void imprimirDetalles() {
+        super.imprimirDetalles();
+        System.out.println("Meses de contrato: " + mesesContrato);
+    }
+
+    // Más metodos
+}
+
+
+Empresa.java:
+import java.util.ArrayList;
+import java.util.List;
+
+public class Empresa {
+    private List<Empleado> empleados;
+
+    public Empresa() {
+        empleados = new ArrayList<>();
+    }
+
+    public void contratarEmpleado(Empleado empleado) {
+        empleados.add(empleado);
+    }
+
+    public void despedirEmpleado(Empleado empleado) {
+        empleados.remove(empleado);
+    }
+
+    public List<Empleado> obtenerEmpleadosPorHorasTrabajadasaPartirDe(int horas) {
+        List<Empleado> empleadosPorTipo = new ArrayList<>();
+        for (Empleado empleado : empleados) {
+            if (empleado.getHorasTrabajadas()>horas) {
+                empleadosPorTipo.add(empleado);
+            }
+        }
+        return empleadosPorTipo;
+    }
+
+    // Más metodos
+}
+
+Main.java:
+public class Main {
+    public static void main(String[] args) {
+        Empresa empresa = new Empresa();
+
+        EmpleadoPorHoras emp1 = new EmpleadoPorHoras("Dario Laborde", 45, 15, "Sistemas", "Masculino");
+        EmpleadoFijo emp2 = new EmpleadoFijo("Jorge Gaibor",700,45,"Contabilidad",40, "Masculino");
+        EmpleadoTemporario emp3 = new EmpleadoTemporario("Jordan Salinas",200,20,"Medico",6, "Masculino");
+
+        empresa.contratarEmpleado(emp1);
+        empresa.contratarEmpleado(emp2);
+        empresa.contratarEmpleado(emp3);
+
+        emp1.imprimirDetalles();
+        emp2.imprimirDetalles();
+        emp3.imprimirDetalles();
+    }
+}
+
